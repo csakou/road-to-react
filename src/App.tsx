@@ -1,40 +1,60 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
 import { Slider } from "./sections/ImperativeReact/Slider";
+import { Search } from "./another-todo/Search";
+import { Stories } from "./another-todo/Stories";
+
+import "./App.css";
+import type { IStory } from "./another-todo/Story";
+
+const initialStories: IStory[] = [
+  {
+    title: "React",
+    url: "https://react.dev/",
+    author: "Jordan Walke",
+    numComments: 3,
+    points: 4,
+    objectID: 0,
+  },
+  {
+    title: "Redux",
+    url: "https://redux.js.org/",
+    author: "Dan Abramov, Andrew Clark",
+    numComments: 2,
+    points: 5,
+    objectID: 1,
+  },
+];
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [stories, setStories] = useState<IStory[]>(initialStories);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleRemoveStory = (id: number) => {
+    const newStories = stories.filter((story) => story.objectID !== id);
+
+    setStories(newStories);
+  };
+
+  const searchedStories = stories.filter((story) =>
+    story.title.includes(searchTerm)
+  );
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
       <Slider
         initial={10}
         max={25}
         formatFn={(number) => number.toFixed(2)}
         onChange={(value: string | number) => console.log(value)}
       />
+
+      <Search onChange={handleSearch} />
+
+      <Stories items={searchedStories} onRemoveStory={handleRemoveStory} />
     </>
   );
 }
