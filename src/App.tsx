@@ -26,6 +26,7 @@ const initialStories: IStory[] = [
 function App() {
   const [stories, setStories] = useState<IStory[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -43,27 +44,30 @@ function App() {
 
   const getStories = async (): Promise<{ data: { stories: IStory[] } }> =>
     new Promise((resolve) =>
-      setTimeout(() => resolve({ data: { stories: initialStories } }), 2000)
+      setTimeout(() => resolve({ data: { stories: initialStories } }), 1000)
     );
 
   useEffect(() => {
     getStories()
       .then((res) => {
         setStories(res.data.stories);
+        setIsLoading(false);
       })
       .catch((err) => {
         console.error("Error retrieving data: ", err);
       });
   }, []);
 
-  return searchedStories.length > 0 ? (
+  return (
     <>
       <Search onChange={handleSearch} />
 
-      <Stories items={searchedStories} onRemoveStory={handleRemoveStory} />
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <Stories items={searchedStories} onRemoveStory={handleRemoveStory} />
+      )}
     </>
-  ) : (
-    <p>Loading...</p>
   );
 }
 
