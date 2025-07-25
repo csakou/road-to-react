@@ -56,12 +56,14 @@ function App() {
       });
   }, []);
 
-  return (
+  return searchedStories.length > 0 ? (
     <>
       <Search onChange={handleSearch} />
 
       <Stories items={searchedStories} onRemoveStory={handleRemoveStory} />
     </>
+  ) : (
+    <p>Loading...</p>
   );
 }
 
