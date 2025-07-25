@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { Slider } from "./sections/ImperativeReact/Slider";
+import { useState, useEffect } from "react";
 import { Search } from "./another-todo/Search";
 import { Stories } from "./another-todo/Stories";
 
-import "./App.css";
 import type { IStory } from "./another-todo/Story";
 
 const initialStories: IStory[] = [
@@ -26,7 +24,7 @@ const initialStories: IStory[] = [
 ];
 
 function App() {
-  const [stories, setStories] = useState<IStory[]>(initialStories);
+  const [stories, setStories] = useState<IStory[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,15 +41,23 @@ function App() {
     story.title.includes(searchTerm)
   );
 
+  const getStories = async (): Promise<{ data: { stories: IStory[] } }> =>
+    new Promise((resolve) =>
+      setTimeout(() => resolve({ data: { stories: initialStories } }), 2000)
+    );
+
+  useEffect(() => {
+    getStories()
+      .then((res) => {
+        setStories(res.data.stories);
+      })
+      .catch((err) => {
+        console.error("Error retrieving data: ", err);
+      });
+  }, []);
+
   return (
     <>
-      <Slider
-        initial={10}
-        max={25}
-        formatFn={(number) => number.toFixed(2)}
-        onChange={(value: string | number) => console.log(value)}
-      />
-
       <Search onChange={handleSearch} />
 
       <Stories items={searchedStories} onRemoveStory={handleRemoveStory} />
